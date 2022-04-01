@@ -1,12 +1,17 @@
 {
-  description = "A very basic flake";
-  inputs.utils.url = "github:numtide/flake-utils";
+  description = "A flake root for shared nixos modules";
 
-  outputs = { self, nixpkgs, utils }: {} // utils.lib.eachDefaultSystem (system: {
+  outputs = { ... }: {
+    nixosModules = {
+      "nix/daemon/structuredExtraOptions" = import ./+-nixos/nix-daemon/structuredExtraOptions.nix;
+      "nix/daemon/experimentalFeatures" = import ./+-nixos/nix-daemon/experimentalFeatures.nix;
+    };
 
-    packages.hello = nixpkgs.legacyPackages.${system}.hello;
+    darwinModules = {
+      "nix/registry" = import ./+-darwin/nix.registry.nix;
+      "nix/daemon/autoOptimiseStore" = import ./+-darwin/nix-daemon/autoOptimiseStore;
+      homebrew = import ./+-darwin/homebrew.nix;
+    };
 
-    defaultPackage = self.packages.${system}.hello;
-
-  });
+  };
 }
